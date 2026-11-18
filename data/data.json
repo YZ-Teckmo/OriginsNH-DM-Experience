@@ -1,0 +1,247 @@
+{
+    "characters": [
+        {
+            "name": "Mingshe",
+            "health": {
+                "current": 150,
+                "max": 150
+            },
+            "stamina": {
+                "current": 5,
+                "max": 5
+            },
+            "energy": {
+                "current": 400,
+                "max": 400
+            },
+            "sanity": 100,
+            "portrait": "../assets/preLoaded/portraits/mingshe.png",
+            "portraitSize": {
+                "width": 90,
+                "height": 90
+            },
+            "transformation": {
+                "color": "3, 148, 252",
+                "token": null,
+                "portrait": null,
+                "size": "12px"
+            }
+        },
+        {
+            "name": "Nicholas Copper",
+            "health": {
+                "current": 150,
+                "max": 150
+            },
+            "stamina": {
+                "current": 5,
+                "max": 5
+            },
+            "energy": {
+                "current": 400,
+                "max": 400
+            },
+            "sanity": 100,
+            "portrait": "",
+            "portraitSize": {
+                "width": 90,
+                "height": 90
+            },
+            "transformation": {
+                "color": "3, 148, 252",
+                "token": null,
+                "portrait": null,
+                "size": "12px"
+            }
+        },
+        {
+            "name": "Pana",
+            "health": {
+                "current": 150,
+                "max": 150
+            },
+            "stamina": {
+                "current": 5,
+                "max": 5
+            },
+            "energy": {
+                "current": 400,
+                "max": 400
+            },
+            "sanity": 100,
+            "portrait": "../assets/preLoaded/portraits/mingshe.png",
+            "portraitSize": {
+                "width": 90,
+                "height": 90
+            },
+            "transformation": {
+                "color": "3, 148, 252",
+                "token": null,
+                "portrait": null,
+                "size": "12px"
+            }
+        },
+        {
+            "name": "Nicolau Dacota",
+            "health": {
+                "current": 100,
+                "max": 100
+            },
+            "stamina": {
+                "current": 60,
+                "max": 60
+            },
+            "energy": {
+                "current": 240,
+                "max": 240
+            },
+            "sanity": 100,
+            "portrait": "../assets/preLoaded/portraits/dacota.png",
+            "portraitSize": {
+                "width": 90,
+                "height": 90
+            },
+            "transformation": {
+                "color": "3, 148, 252",
+                "token": null,
+                "portrait": null,
+                "size": "12px"
+            }
+        },
+        {
+            "name": "Kumimin",
+            "health": {
+                "current": 60,
+                "max": 60
+            },
+            "stamina": {
+                "current": 40,
+                "max": 40
+            },
+            "energy": {
+                "current": 150,
+                "max": 150
+            },
+            "sanity": 100,
+            "portrait": "../assets/preLoaded/portraits/kumimin.png",
+            "portraitSize": {
+                "width": 75,
+                "height": 75
+            },
+            "transformation": {
+                "color": "3, 148, 252",
+                "token": null,
+                "portrait": null,
+                "size": "12px"
+            }
+        },
+        {
+            "name": "Emnt",
+            "health": {
+                "current": 60,
+                "max": 60
+            },
+            "stamina": {
+                "current": 120,
+                "max": 120
+            },
+            "energy": {
+                "current": 120,
+                "max": 120
+            },
+            "sanity": 100,
+            "portrait": "../assets/preLoaded/portraits/emnt.png",
+            "portraitSize": {
+                "width": 90,
+                "height": 90
+            },
+            "transformation": {
+                "color": "3, 148, 252",
+                "token": null,
+                "portrait": null,
+                "size": "12px"
+            }
+        },
+        {
+            "name": "Scarlett",
+            "health": {
+                "current": 200,
+                "max": 200
+            },
+            "stamina": {
+                "current": 170,
+                "max": 170
+            },
+            "energy": {
+                "current": 30,
+                "max": 30
+            },
+            "sanity": 100,
+            "portrait": "../assets/preLoaded/portraits/scarlet.png",
+            "portraitSize": {
+                "width": 80,
+                "height": 80
+            },
+            "transformation": {
+                "color": "3, 148, 252",
+                "token": null,
+                "portrait": null,
+                "size": "12px"
+            }
+        },
+        {
+            "name": "Cass Crystaline",
+            "health": {
+                "current": "??",
+                "max": "??"
+            },
+            "stamina": {
+                "current": "??",
+                "max": "??"
+            },
+            "energy": {
+                "current": "??",
+                "max": "??"
+            },
+            "sanity": "??",
+            "portrait": "",
+            "portraitSize": {
+                "width": 90,
+                "height": 90
+            },
+            "transformation": {
+                "color": "3, 148, 252",
+                "token": null,
+                "portrait": null,
+                "size": "12px"
+            }
+        },
+        {
+            "name": "Nahan",
+            "health": {
+                "current": 210,
+                "max": 250
+            },
+            "stamina": {
+                "current": 150,
+                "max": 150
+            },
+            "energy": {
+                "current": 100,
+                "max": 100
+            },
+            "sanity": -10,
+            "portrait": "",
+            "portraitSize": {
+                "width": 90,
+                "height": 90
+            },
+            "transformation": {
+                "color": "3, 148, 252",
+                "token": null,
+                "portrait": null,
+                "size": "12px"
+            }
+        }
+    ]
+}

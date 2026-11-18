@@ -1,0 +1,289 @@
+@import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&display=swap');
+
+:root {
+    --overlay-background: url('../assets/base/Background.jpg');
+    --next-background: url('');
+    --fade-time: 0;
+    --on-of: 0;
+    --position-cinematic: -15vh;
+    --zoom-out: 1.15;
+    --image-cutscene: url('');
+    --is-cutscene: 0;
+    --is-combat: 0;
+    --active-map: url('');
+    --transformed-color: rgba(255, 255, 255, 0.2);
+}
+
+
+body {
+    background: var(--overlay-background) no-repeat;
+    background-position: center;
+    background-size: cover;
+    min-height: 100vh;
+    overflow: hidden
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: var(--next-background);
+    background-position: center;
+    background-size: cover;
+    min-height: 100vh;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+    z-index: -2;
+    pointer-events: none;
+}
+
+body.next::before {
+    opacity: 1;
+}
+
+
+/* ====== BARRAS CINEMATICAS ======*/
+
+
+.cinema-bar-top {
+    top: var(--position-cinematic);
+    right: inherit;
+    width: 3000px;
+    height: 10vh;
+    background: black;
+    box-shadow: 0 0 20px rgba(10, 10, 10, 0.8);
+    position: absolute;
+    z-index: 10;
+    transition: top 1.3s ease;
+}
+
+.cinema-bar-bottom {
+    bottom: var(--position-cinematic);
+    right: -100px;
+    width: 3000px;
+    height: 10vh;
+    background: black;
+    box-shadow: 0 0 20px rgba(10, 10, 10, 0.8);
+    position: absolute;
+    z-index: 10;
+    transition: bottom 1.3s ease;
+}
+
+
+/* ====== CUTSCENE BACKGROUNDS ======*/
+
+.cutscene {
+    pointer-events: none;
+    user-select: none;
+    opacity: var(--is-cutscene);
+}
+
+.background {
+    background: var(--image-cutscene) no-repeat;
+    width: 100vw;
+    height: 100vh;
+    position: absolute;
+    z-index: 1;
+    transform: scale(var(--zoom-out));
+    transition: transform 1.3s ease;
+    background-size: cover;
+}
+
+.videoground {
+    width: 100%;
+    height: 100%;
+    transform: scale(var(--zoom-out));
+    transition: transform 1.3s ease;
+}
+
+.black-screen {
+    width: 110vw;
+    height: 110vh;
+    position: absolute;
+    top: -15px;
+    left: -15px;
+    background: black;
+    opacity: var(--on-of);
+    transition: opacity var(--fade-time) ease;
+    z-index: 10;
+}
+
+
+/* ====== MAPS & OVERLAY ======*/
+
+.selected-mode {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 0;
+}
+
+.menu {
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.iniciative {
+    height: 95vh;
+    width: 30vw;
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    display: none;
+}
+
+.iniciative.active {}
+
+.members-container {
+    display: flex;
+    flex-direction: column;
+    height: 95vh;
+    width: 20vw;
+    display: grid;
+    grid-template-rows: repeat(5, auto);
+    grid-auto-flow: column;
+    grid-auto-columns: 150px;
+}
+
+.map {
+    height: 95vh;
+    width: 60vw;
+    overflow: hidden;
+}
+
+.map img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    user-select: none;
+}
+
+
+/* ====== PLAYER ======*/
+
+.player-container {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    background-color: transparent;
+    display: flex;
+    flex-direction: column;
+    border-radius: 5px;
+    margin-top: 0px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    margin: 10px;
+    z-index: -2;
+}
+
+.rolling {
+    width: 30px;
+    height: 30px;
+    margin-top: -10px;
+    margin-left: -10px;
+    position: absolute;
+    z-index: 1;
+    opacity: 0;
+    transition: opacity 1s ease;
+}
+
+.rolling img {
+    height: 100%;
+    width: 100%;
+}
+
+.side-container {
+    display: flex;
+    overflow: hidden;
+    width: 80px;
+    height: 80%;
+}
+
+.player-portrait {
+    height: 90px;
+    width: 90px;
+    bottom: 0px;
+    left: -10px;
+    position: absolute;
+    z-index: -1;
+}
+
+.status-collum {
+    display: flex;
+    flex-direction: column-reverse;
+    height: 80px;
+    width: 30px;
+    margin-left: 52px;
+    position: absolute;
+    transform: rotate(-6deg);
+}
+
+.status {
+    font-family: "Black Ops One", sans-serif;
+    font-size: 10px;
+    margin: 0;
+    width: 100%;
+    font-style: italic;
+    font-weight: bold;
+}
+
+.health {
+    -webkit-text-stroke: 0.2px #00fd3b33;
+}
+
+.stamina {
+    -webkit-text-stroke: 0.2px #fd000033;
+}
+
+.energy {
+    -webkit-text-stroke: 0.2px #0048fd33;
+}
+
+.sanity {
+    -webkit-text-stroke: 0.2px #00f9fd33;
+    margin-bottom: -15px;
+    font-size: 14px;
+    width: 100%;
+    text-align: left;
+}
+
+.name {
+    font-family: "Black Ops One", sans-serif;
+    font-size: 14px;
+    width: 100%;
+    font-style: italic;
+    font-weight: bold;
+    -webkit-text-stroke: 0.2px #0000006d;
+}
+
+.bottom {
+    height: 20%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+/* ====== PLAYER ======*/
+
+.token {
+    width: 50px;
+    height: 50px;
+    position: absolute;
+    cursor: grab;
+    user-select: none;
+    z-index: 2;
+}
+
+.token:active {
+    cursor: grabbing;
+}
+
+.token img {
+    width: 100%;
+    height: 100%;
+}
