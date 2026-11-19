@@ -4,43 +4,65 @@ const channel = new BroadcastChannel("display-channel")
 const menuHandler = document.getElementById("menuHandler");
 const toggleHandler = document.getElementById("toggleHandler");
 const membersHandler = document.getElementById("membersHandler")
+const mapHandler = document.getElementById('mapHandler')
+const mapArea = mapHandler.querySelector(".map-item")
 
 // === Variaveis Base ===
 let activeToken = null
+let tokenCount = 0
 let offsetX = 0
 let offsetY = 0
 let offsetZ = 1
 
 let allCharacters = []
 let activeNames = new Set()
+const checkboxes = new Map()
+
+// === Broadcast Response ===
+channel.onmessage = (e) => {
+    switch (e.data.action) {
+        case "requestState":
+            SendActiveItems()
+            break
+        case "updateCharacters":
+            activeNames = new Set(e.data.activeNames)
+            for (const [name, checkbox] of checkboxes) {
+                checkbox.checked = activeNames.has(name)
+            }
+            break
+    }
+}
 
 // === Execuções Base ===
-/*
-tokens.forEach((token) => {
-    token.addEventListener('mousedown', (e) => {
-        activeToken = token
+mapHandler.addEventListener('mousedown', (e) => {
+    const token = e.target.closest('.token')
+    if (!token) return
 
-        offsetZ++
-        activeToken.style.zIndex = offsetZ
+    activeToken = token
 
-        offsetX = e.clientX - activeToken.offsetLeft
-        offsetY = e.clientY - activeToken.offsetTop
-    })
+    offsetZ++
+    activeToken.style.zIndex = offsetZ
+
+    offsetX = e.clientX - activeToken.offsetLeft
+    offsetY = e.clientY - activeToken.offsetTop
 })
 
 document.addEventListener('mousemove', (e) => {
     if (!activeToken) return
 
-    activeToken.style.left = `${e.clientX - offsetX}px`
-    activeToken.style.top = `${e.clientY - offsetY}px`
+    xPos = `${e.clientX - offsetX}px`
+    yPos = `${e.clientY - offsetY}px`
+
+    activeToken.style.left = xPos
+    activeToken.style.top = yPos
 })
 
 document.addEventListener('mouseup', () => {
-    activeToken = null;
+    if (activeToken) SendToken(activeToken)
+    activeToken = null
 })
-*/
 
-// Saindo do Arquivo Json
+// === JSON ===
 fetch('../data/data.json')
     .then((response) => {
         if (!response.ok) throw new Error(`HTTP ${response.status}`)
@@ -87,11 +109,10 @@ function InstantiatePlayersInEditor() {
         let name = member.querySelector(".editor-name")
         name.innerHTML = character.name
 
-        activeNames = new Set(
-            allCharacters.map(character => character.name)
-        )
-
         let checkbox = member.querySelector(".checked")
+        checkbox.checked = activeNames.has(character.name)
+        checkboxes.set(character.name, checkbox)
+
         checkbox.addEventListener("change", () => {
             if (checkbox.checked) {
                 activeNames.add(character.name)
@@ -104,6 +125,52 @@ function InstantiatePlayersInEditor() {
 
         let portrait = member.querySelector(".editor-portrait")
         portrait.src = `${character.portrait}`
+
+        portrait.addEventListener("click", (e) => {
+            if (e.shiftKey) {
+                InstantiateTokens(`${character.token}`)
+                channel.postMessage({
+                    action: "createToken",
+                    aCharacter: character.token
+                })
+            }
+        })
+
+        const statFields = {
+            health: [curH, maxH],
+            stamina: [curV, maxV],
+            energy: [curE, maxE],
+            sanity: [curS]
+        }
+
+        for (let [stat, inputs] of Object.entries(statFields)) {
+            inputs.forEach((input) => {
+                input.addEventListener('keydown', (e) => {
+                    if (e.key !== "Enter") return
+                    if (inputs.some(i => i.value === "")) return
+
+                    const current = Number(inputs[0].value)
+                    const max = inputs[1] ? Number(inputs[1].value) : null
+
+                    if (stat === "sanity") {
+                        character.sanity = current
+                    } else {
+                        character[stat].current = current
+                        character[stat].max = max
+                    }
+
+                    channel.postMessage({
+                        action: "updateStat",
+                        name: character.name,
+                        stat: stat,
+                        current: current,
+                        max: max
+                    })
+
+                    input.blur()
+                })
+            })
+        }
     }
 }
 
@@ -153,6 +220,38 @@ function SendActiveItems() {
     })
 }
 
+function InstantiateTokens(character) {
+    const token = document.createElement("div")
+    token.className = "token"
+    token.dataset.id = `token-${++tokenCount}`
+
+    const img = document.createElement("img")
+    img.className = "token-img"
+    img.src = character
+    img.alt = ""
+    img.draggable = false
+
+    token.appendChild(img)
+    mapHandler.appendChild(token)
+
+    return token
+}
+
+function SendToken(token) {
+    const mapRect = mapArea.getBoundingClientRect()
+    const tokenRect = token.getBoundingClientRect()
+
+    const x = (tokenRect.left + tokenRect.width / 2 - mapRect.left) / mapRect.width
+    const y = (tokenRect.top + tokenRect.height / 2 - mapRect.top) / mapRect.height
+
+    channel.postMessage({
+        action: "updateTokenPosition",
+        positionX: Math.min(Math.max(x, 0), 1),
+        positionY: Math.min(Math.max(y, 0), 1),
+        actualToken: token.dataset.id
+    })
+}
+
 function PushMenu() {
     menuHandler.classList.toggle("active");
 
@@ -167,12 +266,12 @@ function PushMenu() {
 // === Debug ===
 document.addEventListener("keydown", function (event) {
     if (event.key === "c") {
-        channel.postMessage({action: "cutsceneOn"})
+        channel.postMessage({ action: "cutsceneOn" })
     }
 });
 
 document.addEventListener("keydown", function (event) {
     if (event.key === "v") {
-        channel.postMessage({action: "cutsceneOff"})
+        channel.postMessage({ action: "cutsceneOff" })
     }
 });

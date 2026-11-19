@@ -1,14 +1,14 @@
 /* Chrome, Safari, Edge e Opera */
 input[type="number"]::-webkit-outer-spin-button,
 input[type="number"]::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
+    -webkit-appearance: none;
+    margin: 0;
 }
 
 /* Firefox */
 input[type="number"] {
-  -moz-appearance: textfield;
-  appearance: textfield;
+    -moz-appearance: textfield;
+    appearance: textfield;
 }
 
 .controls-menu {
@@ -114,8 +114,52 @@ input[type="number"] {
 .editor-portrait {
     width: 40px;
     height: 40px;
+    cursor: pointer;
 }
 
 .resto {
     display: flex;
+}
+
+.map {
+    height: 95vh;
+    width: 60vw;
+    overflow: hidden;
+}
+
+.map img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    user-select: none;
+}
+
+.main {
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* ====== PLAYER ======*/
+
+.token {
+    width: 50px;
+    height: 50px;
+    position: absolute;
+    cursor: grab;
+    user-select: none;
+    z-index: 2;
+    top: 50%;
+    left: 50%;
+}
+
+.token:active {
+    cursor: grabbing;
+}
+
+.token img {
+    width: 100%;
+    height: 100%;
 }

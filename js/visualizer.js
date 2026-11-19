@@ -5,8 +5,9 @@ const channel = new BroadcastChannel("display-channel")
 const blackScreenHandler = document.getElementById("blackScreenHandler")
 const cinematicBarsHandler = document.getElementById("cinematicBarsHandler")
 const videoGroundHandler = document.getElementById("videoGroundHandler")
-const tokens = document.querySelectorAll('.token')
 const membersHandler = document.getElementById('membersHandler')
+const mapHandler = document.getElementById('mapHandler')
+const mapArea = mapHandler.querySelector(".map-item")
 
 // === Variaveis Base ===
 let cinematicActive = false
@@ -16,10 +17,16 @@ const memberInstances = new Map()
 let removeTime = null
 const EXIT = 350
 const MOVE = 500
+const TRATIO = 700
+
+let xPos = 0
+let yPos = 0
+let activeToken = null
+let tokenCount = 0
 
 // === Broadcast Response ===
 channel.onmessage = (e) => {
-    switch(e.data.action) {
+    switch (e.data.action) {
         case "cutsceneOn":
             StartCutscene("image", "../assets/preLoaded/cutscenes/background.jpg")
             break
@@ -34,11 +41,39 @@ channel.onmessage = (e) => {
             )
             InstantiateActivePlayers()
             break
+        case "createToken":
+            InstantiateTokens(e.data.aCharacter)
+            break
+        case "updateTokenPosition":
+            xPos = e.data.positionX
+            yPos = e.data.positionY
+            activeToken = e.data.actualToken
+            ExecuteToken()
+            break
+        case "updateStat":
+            const character = allCharacters.find(c => c.name === e.data.name)
+            if (!character) break
+
+            const old = e.data.stat === "sanity"
+                ? character.sanity
+                : character[e.data.stat].current
+
+            if (e.data.stat === "sanity") {
+                character.sanity = e.data.current
+            } else {
+                character[e.data.stat].current = e.data.current
+                character[e.data.stat].max = e.data.max
+            }
+
+            const member = memberInstances.get(e.data.name)
+            if (member) UpdateStat(member, e.data.stat, character, e.data.current - old)
+            break
     }
 }
 
 // === Execuções Base ===
-// Saindo do Arquivo Json
+
+// === JSON ===
 fetch('../data/data.json')
     .then((response) => {
         if (!response.ok) throw new Error(`HTTP ${response.status}`)
@@ -56,6 +91,8 @@ fetch('../data/data.json')
         }
 
         InstantiateActivePlayers()
+
+        channel.postMessage({ action: "requestState" })
     })
     .catch((err) => console.error('Erro ao carregar:', err))
 
@@ -118,6 +155,34 @@ function ScheduleRemove() {
     }, EXIT)
 }
 
+function UpdateStat(member, stat, character, change) {
+    const element = member.querySelector(`.${stat}`)
+
+    element.textContent = stat === "sanity"
+        ? `${character.sanity}%`
+        : `${character[stat].current}/${character[stat].max}`
+
+    AnimateStat(element, change)
+}
+
+function AnimateStat(element, change) {
+    // verde se subiu, vermelho se desceu, amarelo se só mudou o máximo
+    const color = change > 0 ? "#4ade80" : change < 0 ? "#f87171" : "#facc15"
+
+    element.animate([
+        { transform: "translateX(0)", color: color, textShadow: `0 0 12px ${color}` },
+        { transform: "translateX(-6px)", color: color, textShadow: `0 0 12px ${color}`, offset: 0.15 },
+        { transform: "translateX(6px)", color: color, textShadow: `0 0 12px ${color}`, offset: 0.30 },
+        { transform: "translateX(-5px)", color: color, textShadow: `0 0 12px ${color}`, offset: 0.45 },
+        { transform: "translateX(5px)", color: color, textShadow: `0 0 12px ${color}`, offset: 0.60 },
+        { transform: "translateX(-2px)", color: color, textShadow: `0 0 12px ${color}`, offset: 0.75 },
+        { transform: "translateX(0)" }
+    ], {
+        duration: 450,
+        easing: "ease-out"
+    })
+}
+
 function UpdateInfo(member, character) {
 
     member.querySelector(".sanity").textContent = `${character.sanity}%`
@@ -165,7 +230,7 @@ function RemoveInactive() {
     if (leavingMembers.length === 0) return
 
     const remainingMember = [...memberInstances.entries()].filter(([name, member]) => !member.classList.contains("leave"))
-    .map(([name, member]) => member)
+        .map(([name, member]) => member)
 
     const oldPosition = new Map()
 
@@ -193,8 +258,8 @@ function RemoveInactive() {
 
             if (Math.abs(deltaX) > 0.5 || Math.abs(deltaY) > 0.5) {
                 member.animate([
-                    {transform: `translate(${deltaX}px, ${deltaY}px)`},
-                    {transform: "translate(0, 0)"}
+                    { transform: `translate(${deltaX}px, ${deltaY}px)` },
+                    { transform: "translate(0, 0)" }
                 ], {
                     duration: MOVE,
                     easing: "cubic-bezier(0.22, 1, 0.36, 1)"
@@ -202,6 +267,55 @@ function RemoveInactive() {
                 )
             }
         }
+    })
+}
+
+function InstantiateTokens(character) {
+    const token = document.createElement("div")
+    token.className = "token"
+    token.dataset.id = `token-${++tokenCount}`
+
+    const img = document.createElement("img")
+    img.className = "token-img"
+    img.src = character
+    img.alt = ""
+    img.draggable = false
+
+    token.appendChild(img)
+    mapHandler.appendChild(token)
+
+    return token
+}
+
+function ExecuteToken() {
+    const token = mapHandler.querySelector(`.token[data-id="${activeToken}"]`)
+    if (!token) return
+    MoveTo(token, xPos, yPos)
+}
+
+function MoveTo(token, xRatio, yRatio) {
+    const mapRect = mapArea.getBoundingClientRect()
+    const parent = token.offsetParent
+    const parentRect = parent.getBoundingClientRect()
+
+    const screenX = mapRect.left + xRatio * mapRect.width
+    const screenY = mapRect.top + yRatio * mapRect.height
+
+    const targetLeft = screenX - parentRect.left - parent.clientLeft + parent.scrollLeft - token.offsetWidth / 2
+    const targetTop = screenY - parentRect.top - parent.clientTop + parent.scrollTop - token.offsetHeight / 2
+
+    const startLeft = token.offsetLeft
+    const startTop = token.offsetTop
+
+    token.style.left = `${targetLeft}px`
+    token.style.top = `${targetTop}px`
+
+    token.animate([
+        { left: `${startLeft}px`, top: `${startTop}px` },
+        { left: `${targetLeft}px`, top: `${targetTop}px` }
+    ], {
+        duration: TRATIO,
+        easing: "cubic-bezier(0.22, 1, 0.36, 1)"
     })
 }
 

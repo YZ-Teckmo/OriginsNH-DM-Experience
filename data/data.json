@@ -16,6 +16,7 @@
             },
             "sanity": 100,
             "portrait": "../assets/preLoaded/portraits/mingshe.png",
+            "token": "../assets/preLoaded/portraits/mingshe.png",
             "portraitSize": {
                 "width": 90,
                 "height": 90
@@ -57,19 +58,20 @@
         {
             "name": "Pana",
             "health": {
-                "current": 150,
-                "max": 150
+                "current": 100,
+                "max": 100
             },
             "stamina": {
                 "current": 5,
                 "max": 5
             },
             "energy": {
-                "current": 400,
-                "max": 400
+                "current": 195,
+                "max": 195
             },
             "sanity": 100,
-            "portrait": "../assets/preLoaded/portraits/mingshe.png",
+            "portrait": "../assets/preLoaded/portraits/pana.png",
+            "token": "../assets/preLoaded/tokens/pana.png",
             "portraitSize": {
                 "width": 90,
                 "height": 90
@@ -97,6 +99,7 @@
             },
             "sanity": 100,
             "portrait": "../assets/preLoaded/portraits/dacota.png",
+            "token": "../assets/preLoaded/tokens/dacota.png",
             "portraitSize": {
                 "width": 90,
                 "height": 90
@@ -124,6 +127,7 @@
             },
             "sanity": 100,
             "portrait": "../assets/preLoaded/portraits/kumimin.png",
+            "token": "../assets/preLoaded/tokens/kumimin.png",
             "portraitSize": {
                 "width": 75,
                 "height": 75
@@ -151,6 +155,7 @@
             },
             "sanity": 100,
             "portrait": "../assets/preLoaded/portraits/emnt.png",
+            "token": "../assets/preLoaded/tokens/kumimin.png",
             "portraitSize": {
                 "width": 90,
                 "height": 90
@@ -178,6 +183,7 @@
             },
             "sanity": 100,
             "portrait": "../assets/preLoaded/portraits/scarlet.png",
+            "token": "../assets/preLoaded/tokens/scarlet.png",
             "portraitSize": {
                 "width": 80,
                 "height": 80
@@ -231,7 +237,8 @@
                 "max": 100
             },
             "sanity": -10,
-            "portrait": "",
+            "portrait": "../assets/preLoaded/portraits/nahan.png",
+            "token": "../assets/preLoaded/portraits/nahan.png",
             "portraitSize": {
                 "width": 90,
                 "height": 90
