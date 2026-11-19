@@ -12,6 +12,7 @@
     --is-combat: 0;
     --active-map: url('');
     --transformed-color: rgba(255, 255, 255, 0.2);
+    --character-on: 0;
 }
 
 
@@ -178,6 +179,24 @@ body.next::before {
     border: 1px solid rgba(255, 255, 255, 0.2);
     margin: 10px;
     z-index: -2;
+
+    opacity: 1;
+    transform: translateY(0) scale(1);
+
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    will-change: opacity, transform;
+}
+
+.player-container.enter {
+    opacity: 0;
+    transform: translateY(12px) scale(0.96);
+}
+
+.player-container.leave {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.96);
+
+    pointer-events: none;
 }
 
 .rolling {

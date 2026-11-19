@@ -1,0 +1,121 @@
+/* Chrome, Safari, Edge e Opera */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.controls-menu {
+    position: fixed;
+    inset: 0;
+
+    width: 100vw;
+    height: 100vh;
+
+    background-color: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(5px);
+
+    z-index: 9998;
+
+    transform: translateX(-100%);
+    transition: transform 0.5s ease;
+
+    overflow-y: auto;
+}
+
+.controls-menu.active {
+    transform: translateX(0);
+}
+
+.menu-content {
+    padding: 40px;
+    color: white;
+}
+
+.menu-toggle {
+    position: fixed;
+
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+
+    width: 40px;
+    height: 70px;
+
+    border: none;
+    border-radius: 0 10px 10px 0;
+
+    background-color: #333;
+    color: white;
+
+    font-size: 20px;
+    cursor: pointer;
+
+    z-index: 9999;
+
+    transition: background-color 0.2s ease;
+}
+
+.menu-toggle:hover {
+    background-color: #555;
+}
+
+.active-players {
+    display: flex;
+    gap: 10px;
+}
+
+.playerMenu-container {
+    width: 150px;
+    height: 150px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid rgba(255, 255, 255, 0.2)
+}
+
+.info {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.info input {
+    width: 30px;
+    height: 20px;
+    font-size: 8px;
+    background-color: transparent;
+    border: none;
+    text-align: center;
+}
+
+.info h1 {
+    font-size: 6px;
+    margin: 0px;
+    padding: 0;
+
+
+}
+
+.editor-name {
+    font-size: 10px;
+    margin: 0px;
+    padding: 0;
+}
+
+.editor-portrait {
+    width: 40px;
+    height: 40px;
+}
+
+.resto {
+    display: flex;
+}
