@@ -17,6 +17,11 @@
             "sanity": 100,
             "portrait": "../assets/preLoaded/portraits/mingshe.png",
             "token": "../assets/preLoaded/portraits/mingshe.png",
+            "tokenInfo": {
+                "id": 1,
+                "width": 50,
+                "height": 50
+            },
             "portraitSize": {
                 "width": 90,
                 "height": 90
@@ -72,6 +77,11 @@
             "sanity": 100,
             "portrait": "../assets/preLoaded/portraits/pana.png",
             "token": "../assets/preLoaded/tokens/pana.png",
+            "tokenInfo": {
+                "id": 3,
+                "width": 50,
+                "height": 50
+            },
             "portraitSize": {
                 "width": 90,
                 "height": 90
@@ -97,9 +107,14 @@
                 "current": 240,
                 "max": 240
             },
-            "sanity": 100,
+            "sanity": 80,
             "portrait": "../assets/preLoaded/portraits/dacota.png",
             "token": "../assets/preLoaded/tokens/dacota.png",
+            "tokenInfo": {
+                "id": 4,
+                "width": 70,
+                "height": 70
+            },
             "portraitSize": {
                 "width": 90,
                 "height": 90
@@ -128,6 +143,11 @@
             "sanity": 100,
             "portrait": "../assets/preLoaded/portraits/kumimin.png",
             "token": "../assets/preLoaded/tokens/kumimin.png",
+            "tokenInfo": {
+                "id": 5,
+                "width": 50,
+                "height": 50
+            },
             "portraitSize": {
                 "width": 75,
                 "height": 75
@@ -156,6 +176,11 @@
             "sanity": 100,
             "portrait": "../assets/preLoaded/portraits/emnt.png",
             "token": "../assets/preLoaded/tokens/kumimin.png",
+            "tokenInfo": {
+                "id": 6,
+                "width": 80,
+                "height": 80
+            },
             "portraitSize": {
                 "width": 90,
                 "height": 90
@@ -184,9 +209,42 @@
             "sanity": 100,
             "portrait": "../assets/preLoaded/portraits/scarlet.png",
             "token": "../assets/preLoaded/tokens/scarlet.png",
+            "tokenInfo": {
+                "id": 7,
+                "width": 50,
+                "height": 50
+            },
             "portraitSize": {
                 "width": 80,
                 "height": 80
+            },
+            "transformation": {
+                "color": "3, 148, 252",
+                "token": null,
+                "portrait": null,
+                "size": "12px"
+            }
+        },
+        {
+            "name": "Ashley",
+            "health": {
+                "current": "150",
+                "max": "150"
+            },
+            "stamina": {
+                "current": "200",
+                "max": "200"
+            },
+            "energy": {
+                "current": "300",
+                "max": "300"
+            },
+            "sanity": "125%",
+            "portrait": "",
+            "portraitSize": {
+                "id": 8,
+                "width": 90,
+                "height": 90
             },
             "transformation": {
                 "color": "3, 148, 252",
@@ -239,6 +297,11 @@
             "sanity": -10,
             "portrait": "../assets/preLoaded/portraits/nahan.png",
             "token": "../assets/preLoaded/portraits/nahan.png",
+            "tokenInfo": {
+                "id": 10,
+                "width": 50,
+                "height": 50
+            },
             "portraitSize": {
                 "width": 90,
                 "height": 90

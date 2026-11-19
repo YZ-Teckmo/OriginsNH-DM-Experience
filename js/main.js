@@ -1,15 +1,18 @@
 // === HTML Imports ===
 const root = document.documentElement
 const channel = new BroadcastChannel("display-channel")
-const menuHandler = document.getElementById("menuHandler");
-const toggleHandler = document.getElementById("toggleHandler");
+const menuHandler = document.getElementById("menuHandler")
+const enemyMenuHandler = document.getElementById("enemyMenuHandler")
+const toggleHandler = document.getElementById("toggleHandler")
+const secondToggleHandler = document.getElementById("secondToggleHandler")
 const membersHandler = document.getElementById("membersHandler")
+const enemiesHandler = document.getElementById("enemiesHandler")
 const mapHandler = document.getElementById('mapHandler')
 const mapArea = mapHandler.querySelector(".map-item")
+const selectsContainer = document.getElementById("selectsContainer")
 
 // === Variaveis Base ===
 let activeToken = null
-let tokenCount = 0
 let offsetX = 0
 let offsetY = 0
 let offsetZ = 1
@@ -17,6 +20,10 @@ let offsetZ = 1
 let allCharacters = []
 let activeNames = new Set()
 const checkboxes = new Map()
+
+let allEnemies = []
+
+let allMaps = []
 
 // === Broadcast Response ===
 channel.onmessage = (e) => {
@@ -82,6 +89,39 @@ fetch('../data/data.json')
     })
     .catch((err) => console.error('Erro ao carregar:', err))
 
+
+fetch('../data/assets.json')
+    .then((response) => {
+        if (!response.ok) throw new Error(`HTTP ${response.status}`)
+        return response.json()
+    })
+    .then((data) => {
+        Object.entries(data).forEach(([category, list]) => {
+            if (!Array.isArray(list)) return
+
+            const selectElement = InstantiateSelect(category)
+
+            CreateImageSelect(
+                selectElement,
+                list,
+                (item) => OnSelected(category, item)
+            )
+        })
+    })
+    .catch((err) => console.error('Erro ao carregar:', err))
+
+
+fetch('../data/enemies.json')
+    .then((response) => {
+        if (!response.ok) throw new Error(`HTTP ${response.status}`)
+        return response.json()
+    })
+    .then((data) => {
+        allEnemies = data.enemies
+        InstantiateEnemiesInEditor()
+    })
+    .catch((err) => console.error('Erro ao carregar:', err))
+
 // === Funções ===
 function InstantiatePlayersInEditor() {
     console.log(allCharacters)
@@ -128,10 +168,20 @@ function InstantiatePlayersInEditor() {
 
         portrait.addEventListener("click", (e) => {
             if (e.shiftKey) {
-                InstantiateTokens(`${character.token}`)
+                InstantiateTokens(character)
                 channel.postMessage({
                     action: "createToken",
-                    aCharacter: character.token
+                    aCharacter: character
+                })
+            }
+        })
+
+        portrait.addEventListener("click", (e) => {
+            if (e.ctrlKey) {
+                RemoveToken(character.tokenInfo.id)
+                channel.postMessage({
+                    action: "deleteToken",
+                    aCharacterId: character.tokenInfo.id
                 })
             }
         })
@@ -223,11 +273,13 @@ function SendActiveItems() {
 function InstantiateTokens(character) {
     const token = document.createElement("div")
     token.className = "token"
-    token.dataset.id = `token-${++tokenCount}`
+    token.dataset.id = `token-${character.tokenInfo.id}`
+    token.style.width = `${character.tokenInfo.width}px`
+    token.style.height = `${character.tokenInfo.height}px`
 
     const img = document.createElement("img")
     img.className = "token-img"
-    img.src = character
+    img.src = character.token
     img.alt = ""
     img.draggable = false
 
@@ -235,6 +287,16 @@ function InstantiateTokens(character) {
     mapHandler.appendChild(token)
 
     return token
+}
+
+function RemoveToken(tokenId) {
+    const token = mapHandler.querySelector(`.token[data-id="token-${tokenId}"]`)
+
+    if (token) {
+        token.remove()
+    } else {
+        console.warn(`Token ${tokenId} não encontrado no mapa.`)
+    }
 }
 
 function SendToken(token) {
@@ -252,6 +314,103 @@ function SendToken(token) {
     })
 }
 
+function OnSelected(category, item) {
+    console.log(category, item)
+
+    switch (category) {
+        case "maps":
+            channel.postMessage({
+            })
+            break
+        case "backgrounds":
+            document.getElementById("result").textContent = `Fundo: ${item.name}`
+            break
+        case "cutscenes":
+            channel.postMessage({
+                action: "cutsceneOn",
+                path: item.path,
+                type: item.type
+            })
+            break
+        default:
+            document.getElementById("result").textContent = `${category}: ${item.name}`
+    }
+}
+
+function InstantiateSelect(category) {
+    selectsContainer.insertAdjacentHTML("beforeend", `
+            <div class="img-select">
+                <span class="img-select-title"></span>
+                <button class="img-select-button" type="button">
+                    <img class="selected-img" src="" alt="">
+                    <span class="selected-label"></span>
+                    <span class="arrow">▾</span>
+                </button>
+                <div class="img-select-options"></div>
+            </div>
+        `)
+
+    const selectElement = selectsContainer.lastElementChild
+
+    const title = category.charAt(0).toUpperCase() + category.slice(1)
+    selectElement.querySelector(".img-select-title").textContent = title
+
+    selectElement.querySelector(".selected-label").textContent = title
+
+    return selectElement
+}
+
+function CreateImageSelect(selectElement, items, onSelect) {
+    const button = selectElement.querySelector(".img-select-button")
+    const selectedImg = selectElement.querySelector(".selected-img")
+    const selectedLabel = selectElement.querySelector(".selected-label")
+    const optionsBox = selectElement.querySelector(".img-select-options")
+
+    function Select(item, option) {
+        optionsBox.querySelectorAll(".img-option").forEach(o => o.classList.remove("selected"))
+        option.classList.add("selected")
+
+        selectedImg.src = item.path
+        selectedLabel.textContent = item.name
+
+        selectElement.classList.remove("open")
+        onSelect(item)
+    }
+
+    items.forEach((item) => {
+        const option = document.createElement("button")
+        option.type = "button"
+        option.className = "img-option"
+        option.title = item.name
+
+        const img = document.createElement("img")
+        img.src = item.path
+        img.alt = item.name
+
+        option.appendChild(img)
+        option.addEventListener("click", () => Select(item, option))
+        optionsBox.appendChild(option)
+    })
+
+    button.addEventListener("click", () => {
+        selectElement.classList.toggle("open")
+    })
+
+    document.addEventListener("click", (e) => {
+        if (!selectElement.contains(e.target)) selectElement.classList.remove("open")
+    })
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") selectElement.classList.remove("open")
+    })
+
+    const first = optionsBox.querySelector(".img-option")
+    if (first) {
+        first.classList.add("selected")
+        selectedImg.src = items[0].path
+        selectedLabel.textContent = items[0].name
+    }
+}
+
 function PushMenu() {
     menuHandler.classList.toggle("active");
 
@@ -261,6 +420,92 @@ function PushMenu() {
         toggleHandler.innerHTML = "❯";
     }
 
+}
+
+function PushEnemyMenu() {
+    enemyMenuHandler.classList.toggle("active");
+
+    if (enemyMenuHandler.classList.contains("active")) {
+        secondToggleHandler.innerHTML = "❯";
+    } else {
+        secondToggleHandler.innerHTML = "❮";
+    }
+
+}
+
+function InstantiateEnemiesInEditor() {
+    for (let enemy of allEnemies) {
+        let member = InstantiateEnemy()
+
+        let curH = member.querySelector(".curH")
+        curH.value = enemy.health.current
+        let maxH = member.querySelector(".maxH")
+        maxH.value = enemy.health.max
+
+        let curV = member.querySelector(".curV")
+        curV.value = enemy.shield.current
+        let maxV = member.querySelector(".maxV")
+        maxV.value = enemy.shield.max
+
+        let curS = member.querySelector(".curS")
+        curS.value = enemy.sanity
+
+        let name = member.querySelector(".editor-name")
+        name.innerHTML = enemy.name
+
+        let portrait = member.querySelector(".editor-portrait")
+        portrait.src = `${enemy.token}`
+
+        portrait.addEventListener("click", (e) => {
+            if (e.shiftKey) {
+                InstantiateTokens(enemy)
+                channel.postMessage({
+                    action: "createToken",
+                    aCharacter: enemy
+                })
+            }
+        })
+
+        portrait.addEventListener("click", (e) => {
+            if (e.ctrlKey) {
+                RemoveToken(enemy.tokenInfo.id)
+                channel.postMessage({
+                    action: "deleteToken",
+                    aCharacterId: enemy.tokenInfo.id
+                })
+            }
+        })
+    }
+}
+
+function InstantiateEnemy() {
+    enemiesHandler.insertAdjacentHTML("beforeend", ` 
+            <div class="playerMenu-container">
+                <h1 class="editor-name">???</h1>
+                <div class="resto">
+                    <img class="editor-portrait" src="../assets/preLoaded/portraits/mingshe.png" alt="">
+                </div>
+                <div class="inputs">
+                    <div class="info">
+                        <h1>Vida</h1><input class="curH" type="number" name="" id=""><input class="maxH"
+                            type="number" name="" id="">
+                    </div>
+                    <div class="info">
+                        <h1>Escudo</h1><input class="curV" type="number" name="" id=""><input class="maxV"
+                            type="number" name="" id="">
+                    </div>
+                    <div class="info">
+                        <h1>Sanidade</h1><input class="curS" type="number" name="" id="">
+                    </div>
+                    <div class="info">
+                        <h1>RD</h1><input class="lastDice" type="number" name="" id="">
+                    </div>
+                </div>
+            </div>
+        </div>
+    `)
+
+    return enemiesHandler.lastElementChild
 }
 
 // === Debug ===

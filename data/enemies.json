@@ -1,0 +1,22 @@
+{
+    "enemies": [
+        {
+            "name": "Eradicator X1",
+            "health": {
+                "current": 100,
+                "max": 100
+            },
+            "shield": {
+                "current": 100,
+                "max": 100
+            },
+            "sanity": 100,
+            "rd": 35,
+            "token": "../assets/preLoaded/tokens/eradicator.png",
+            "tokenInfo": {
+                "width": 100,
+                "height": 100
+            }
+        }
+    ]
+}

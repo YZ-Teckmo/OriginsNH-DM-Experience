@@ -11,6 +11,7 @@ const mapArea = mapHandler.querySelector(".map-item")
 
 // === Variaveis Base ===
 let cinematicActive = false
+let isInCutscene = false
 let allCharacters = []
 let activeNames = []
 const memberInstances = new Map()
@@ -28,7 +29,7 @@ let tokenCount = 0
 channel.onmessage = (e) => {
     switch (e.data.action) {
         case "cutsceneOn":
-            StartCutscene("image", "../assets/preLoaded/cutscenes/background.jpg")
+            StartCutscene(e.data.type, e.data.path)
             break
         case "cutsceneOff":
             EndCutscene()
@@ -43,6 +44,9 @@ channel.onmessage = (e) => {
             break
         case "createToken":
             InstantiateTokens(e.data.aCharacter)
+            break
+        case "deleteToken":
+            RemoveToken(e.data.aCharacterId)
             break
         case "updateTokenPosition":
             xPos = e.data.positionX
@@ -99,6 +103,7 @@ fetch('../data/data.json')
 
 // === Funções ===
 function InstantiateActivePlayers() {
+    UpdateCutsceneLayout()
 
     const activeCharacters = allCharacters.filter(character => activeNames.includes(character.name))
 
@@ -270,14 +275,51 @@ function RemoveInactive() {
     })
 }
 
+function UpdateCutsceneLayout() {
+    const isCurrentlyInCutscene = membersHandler.classList.contains("cutscene");
+    if (isCurrentlyInCutscene === isInCutscene) return;
+
+    const members = [...memberInstances.values()]
+    const oldPositions = new Map()
+
+    for (const member of members) {
+        oldPositions.set(member, member.getBoundingClientRect())
+    }
+
+    membersHandler.classList.toggle("cutscene", isInCutscene)
+
+    for (const member of members) {
+        const oldRect = oldPositions.get(member)
+        const newRect = member.getBoundingClientRect()
+
+        const deltaX = oldRect.left - newRect.left
+        const deltaY = oldRect.top - newRect.top
+
+        if (Math.abs(deltaX) > 0.5 || Math.abs(deltaY) > 0.5) {
+            member.animate([
+                { transform: `translate(${deltaX}px, ${deltaY}px)` },
+                { transform: "translate(0, 0)" }
+            ], {
+                duration: MOVE,
+                easing: "cubic-bezier(0.22, 1, 0.36, 1)"
+            })
+            animation.onfinish = () => {
+                member.style.transform = "";
+            }
+        }
+    }
+}
+
 function InstantiateTokens(character) {
     const token = document.createElement("div")
     token.className = "token"
-    token.dataset.id = `token-${++tokenCount}`
+    token.dataset.id = `token-${character.tokenInfo.id}`
+    token.style.width = `${character.tokenInfo.width}px`
+    token.style.height = `${character.tokenInfo.height}px`
 
     const img = document.createElement("img")
     img.className = "token-img"
-    img.src = character
+    img.src = character.token
     img.alt = ""
     img.draggable = false
 
@@ -285,6 +327,20 @@ function InstantiateTokens(character) {
     mapHandler.appendChild(token)
 
     return token
+}
+
+function RemoveToken(tokenId) {
+    const token = mapHandler.querySelector(`.token[data-id="token-${tokenId}"]`)
+
+    if (token) {
+        token.style.animation = `token-fade-out 0.4s ease`
+        setTimeout(() => {
+            token.remove()
+            token.style.animation = `token-fade-out 0.4s ease`
+        }, 400)
+    } else {
+        console.warn(`Token ${tokenId} não encontrado no mapa.`)
+    }
 }
 
 function ExecuteToken() {
@@ -370,11 +426,15 @@ function StartCutscene(type, source) {
     if (type == "video") {
         setTimeout(() => {
             CreateVideoBackground(source)
+            isInCutscene = true
+            UpdateCutsceneLayout()
         }, 1050)
     }
     else {
         setTimeout(() => {
             CreateImageBackground(source)
+            isInCutscene = true
+            UpdateCutsceneLayout()
         }, 1050)
     }
     setTimeout(() => {
@@ -393,10 +453,13 @@ function EndCutscene() {
         StartCinemaMode(false)
         videoGroundHandler.innerHTML = ""
         root.style.setProperty('--image-cutscene', `url("")`)
+        isInCutscene = false
+        UpdateCutsceneLayout()
     }, 1100)
 
     setTimeout(() => {
         FadeInOut(0, 1.2)
+
     }, 1300)
 
     setTimeout(() => {

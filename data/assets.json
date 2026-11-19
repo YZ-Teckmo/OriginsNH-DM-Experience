@@ -1,0 +1,24 @@
+{
+    "maps": [
+        {
+            "id": "1",
+            "name": "Rufored 1",
+            "path": "../assets/preLoaded/maps/stage1.png"
+        }
+    ],
+    "cutscenes": [
+        {
+            "id": "1",
+            "name": "Vulpeflow 1",
+            "path": "../assets/preLoaded/cutscenes/background.jpg",
+            "type": "image"
+        }
+    ],
+    "backgrounds": [
+        {
+            "id": "1",
+            "name": "Rufored 1",
+            "path": "../assets/preLoaded/maps/stage1.png"
+        }
+    ]
+}
