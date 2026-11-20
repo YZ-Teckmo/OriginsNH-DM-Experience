@@ -8,22 +8,44 @@ const videoGroundHandler = document.getElementById("videoGroundHandler")
 const membersHandler = document.getElementById('membersHandler')
 const mapHandler = document.getElementById('mapHandler')
 const mapArea = mapHandler.querySelector(".map-item")
+const mapWorldHandler = document.getElementById("mapWorldHandler")
 
 // === Variaveis Base ===
+// Cutscene
 let cinematicActive = false
 let isInCutscene = false
+
+// Characters
 let allCharacters = []
 let activeNames = []
 const memberInstances = new Map()
 let removeTime = null
 const EXIT = 350
 const MOVE = 500
-const TRATIO = 700
 
+// Tokens
+const TRATIO = 700
 let xPos = 0
 let yPos = 0
 let activeToken = null
 let tokenCount = 0
+
+// Camera
+let firstTransition = true
+let cameraCurrent = {
+    x: 0,
+    y: 0,
+    zoom: 1.2
+}
+
+let cameraTarget = {
+    x: 0,
+    y: 0,
+    zoom: 1.2
+}
+
+let cameraAnimation = null
+let cameraLastFrame = 0
 
 // === Broadcast Response ===
 channel.onmessage = (e) => {
@@ -72,6 +94,12 @@ channel.onmessage = (e) => {
             const member = memberInstances.get(e.data.name)
             if (member) UpdateStat(member, e.data.stat, character, e.data.current - old)
             break
+        case "cameraState":
+            if (!firstTransition) ReceiveCameraState(e.data)
+            break
+        case "cameraTransition":
+            CameraTransition(e.data)
+            break
     }
 }
 
@@ -97,6 +125,7 @@ fetch('../data/data.json')
         InstantiateActivePlayers()
 
         channel.postMessage({ action: "requestState" })
+        channel.postMessage({ action: "requestCameraState" })
     })
     .catch((err) => console.error('Erro ao carregar:', err))
 
@@ -324,13 +353,13 @@ function InstantiateTokens(character) {
     img.draggable = false
 
     token.appendChild(img)
-    mapHandler.appendChild(token)
+    mapWorldHandler.appendChild(token)
 
     return token
 }
 
 function RemoveToken(tokenId) {
-    const token = mapHandler.querySelector(`.token[data-id="token-${tokenId}"]`)
+    const token = mapWorldHandler.querySelector(`.token[data-id="token-${tokenId}"]`)
 
     if (token) {
         token.style.animation = `token-fade-out 0.4s ease`
@@ -344,21 +373,14 @@ function RemoveToken(tokenId) {
 }
 
 function ExecuteToken() {
-    const token = mapHandler.querySelector(`.token[data-id="${activeToken}"]`)
+    const token = mapWorldHandler.querySelector(`.token[data-id="${activeToken}"]`)
     if (!token) return
     MoveTo(token, xPos, yPos)
 }
 
 function MoveTo(token, xRatio, yRatio) {
-    const mapRect = mapArea.getBoundingClientRect()
-    const parent = token.offsetParent
-    const parentRect = parent.getBoundingClientRect()
-
-    const screenX = mapRect.left + xRatio * mapRect.width
-    const screenY = mapRect.top + yRatio * mapRect.height
-
-    const targetLeft = screenX - parentRect.left - parent.clientLeft + parent.scrollLeft - token.offsetWidth / 2
-    const targetTop = screenY - parentRect.top - parent.clientTop + parent.scrollTop - token.offsetHeight / 2
+    const targetLeft = xRatio * mapWorldHandler.clientWidth - token.offsetWidth / 2
+    const targetTop = yRatio * mapWorldHandler.clientHeigh - token.offsetHeight / 2
 
     const startLeft = token.offsetLeft
     const startTop = token.offsetTop
@@ -373,6 +395,139 @@ function MoveTo(token, xRatio, yRatio) {
         duration: TRATIO,
         easing: "cubic-bezier(0.22, 1, 0.36, 1)"
     })
+}
+
+function ReceiveCameraState(data) {
+    if (data.enabled) {
+        const x = Number(data.x)
+        const y = Number(data.y)
+        const zoom = Number(data.zoom)
+
+        cameraTarget = {
+            x: Number.isFinite(x) ? x : 0.5,
+            y: Number.isFinite(y) ? y : 0.5,
+
+            zoom: Math.min(Math.max(Number.isFinite(zoom) ? zoom : 1, 1), 8)
+        }
+    } else {
+        cameraTarget = {
+            x: 0.5,
+            y: 0.5,
+            zoom: 1
+        }
+    }
+
+    if (cameraAnimation === null) {
+        cameraAnimation = requestAnimationFrame(AnimateCamera)
+    }
+}
+
+function ApplyCameraTransform() {
+    const width = mapHandler.clientWidth
+    const height = mapHandler.clientHeight
+
+    const worldWidth = mapWorldHandler.clientWidth
+    const worldHeight = mapWorldHandler.clientHeight
+
+    const zoom = cameraCurrent.zoom
+
+    const bounds = GetVisualizerMapBounds()
+
+    const visibleWidth = width / zoom
+    const visibleHeight = height / zoom
+
+    const desiredCenterX =
+        bounds.left + cameraCurrent.x * bounds.width
+
+    const desiredCenterY =
+        bounds.top + cameraCurrent.y * bounds.height
+
+    let offsetX = desiredCenterX - visibleWidth / 2
+    let offsetY = desiredCenterY - visibleHeight / 2
+
+    const minX = bounds.left
+    const maxX = bounds.left + bounds.width - visibleWidth
+
+    const minY = bounds.top
+    const maxY = bounds.top + bounds.height - visibleHeight
+
+    if (maxX < minX) {
+        offsetX = bounds.left + bounds.width / 2 - visibleWidth / 2
+    } else {
+        offsetX = Math.min(Math.max(offsetX, minX), maxX)
+    }
+
+    if (maxY < minY) {
+        offsetY = bounds.top + bounds.height / 2 - visibleHeight / 2
+    } else {
+        offsetY = Math.min(Math.max(offsetY, minY), maxY)
+    }
+
+    mapWorldHandler.style.transform = `translate3d(${-offsetX * zoom}px, ${-offsetY * zoom}px, 0) scale(${zoom})`
+}
+
+function AnimateCamera(time) {
+    cameraAnimation = null
+
+    const deltaTime = cameraLastFrame
+        ? Math.min(time - cameraLastFrame, 64)
+        : 16
+    cameraLastFrame = time
+
+    const smooth = 1 - Math.exp(-deltaTime / 100)
+    cameraCurrent.x += (cameraTarget.x - cameraCurrent.x) * smooth
+    cameraCurrent.y += (cameraTarget.y - cameraCurrent.y) * smooth
+    cameraCurrent.zoom += (cameraTarget.zoom - cameraCurrent.zoom) * smooth
+
+    ApplyCameraTransform()
+
+    const moving =
+        Math.abs(cameraTarget.x - cameraCurrent.x) > 0.0005 ||
+        Math.abs(cameraTarget.y - cameraCurrent.y) > 0.0005 ||
+        Math.abs(cameraTarget.zoom - cameraCurrent.zoom) > 0.0005
+
+    if (moving) {
+        cameraAnimation = requestAnimationFrame(AnimateCamera)
+    } else {
+        cameraCurrent = { ...cameraTarget }
+        ApplyCameraTransform()
+        cameraLastFrame = 0
+    }
+}
+
+function GetVisualizerMapBounds() {
+    const boxWidth = mapWorldHandler.clientWidth
+    const boxHeight = mapWorldHandler.clientHeight
+
+    if (
+        !mapArea ||
+        !mapArea.naturalWidth ||
+        !mapArea.naturalHeight ||
+        !boxWidth ||
+        !boxHeight
+    ) {
+        return {
+            left: 0,
+            top: 0,
+            width: boxWidth,
+            height: boxHeight
+        }
+    }
+
+    const scale = Math.min(
+        boxWidth / mapArea.naturalWidth,
+        boxHeight / mapArea.naturalHeight
+    )
+
+    const width = mapArea.naturalWidth * scale;
+    const height = mapArea.naturalHeight * scale;
+
+    return {
+        left: (boxWidth - width) / 2,
+        top: (boxHeight - height) / 2,
+        width,
+        height
+    }
 }
 
 function FadeInOut(type, time) {
@@ -467,3 +622,32 @@ function EndCutscene() {
     }, 2400)
 
 }
+
+function CameraTransition(data) {
+    root.style.setProperty("--is-cutscene", `1`)
+    FadeInOut(1, 1)
+
+    setTimeout(() => {
+        ReceiveCameraState(data)
+    }, 1200)
+
+    setTimeout(() => {
+        FadeInOut(0, 1.3)
+    }, 1400)
+
+    setTimeout(() => {
+        root.style.setProperty("--is-cutscene", `0`)
+        firstTransition = false
+    }, 1900)
+}
+
+// :P
+if (mapArea.complete) {
+    ApplyCameraTransform();
+} else {
+    mapArea.addEventListener("load", ApplyCameraTransform, { once: true });
+}
+
+window.addEventListener("resize", () => {
+    ApplyCameraTransform();
+});

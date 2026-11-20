@@ -5,8 +5,8 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/css/mainTheme.css">
-    <link rel="stylesheet" href="/css/visualizerTheme.css">
+    <link rel="stylesheet" href="css/mainTheme.css">
+    <link rel="stylesheet" href="css/visualizerTheme.css">
     <title>Visualizador | Origin New Horizons DM Experience</title>
 </head>
 
@@ -22,10 +22,16 @@
 
     <div class="selected-mode">
         <div class="menu">
-            <div class="iniciative"></div>
-            <div class="map" id="mapHandler">
-                <img class="map-item" src="../assets/preLoaded/maps/stage1.png" alt="" draggable="false">
+            <div class="iniciative">
+
             </div>
+
+            <div class="map" id="mapHandler">
+                <div class="map-world" id="mapWorldHandler">
+                    <img class="map-item" src="../assets/preLoaded/maps/stage1.png" alt="" draggable="false">
+                </div>
+            </div>
+
             <div class="members-container" id="membersHandler">
 
             </div>
@@ -33,6 +39,6 @@
     </div>
 </body>
 
-<script src="/js/visualizer.js"></script>
+<script src="js/visualizer.js"></script>
 
 </html>

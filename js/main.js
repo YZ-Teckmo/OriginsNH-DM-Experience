@@ -1,6 +1,7 @@
 // === HTML Imports ===
 const root = document.documentElement
 const channel = new BroadcastChannel("display-channel")
+
 const menuHandler = document.getElementById("menuHandler")
 const enemyMenuHandler = document.getElementById("enemyMenuHandler")
 const toggleHandler = document.getElementById("toggleHandler")
@@ -10,20 +11,33 @@ const enemiesHandler = document.getElementById("enemiesHandler")
 const mapHandler = document.getElementById('mapHandler')
 const mapArea = mapHandler.querySelector(".map-item")
 const selectsContainer = document.getElementById("selectsContainer")
+const cameraToggleHandler = document.getElementById("cameraToggleHandler")
+const cameraFrameHandler = document.getElementById("cameraFrameHandler")
 
 // === Variaveis Base ===
+//Tokens
 let activeToken = null
 let offsetX = 0
 let offsetY = 0
 let offsetZ = 1
 
+// Characters
 let allCharacters = []
 let activeNames = new Set()
 const checkboxes = new Map()
 
+// Enemies
 let allEnemies = []
 
+//Maps
 let allMaps = []
+
+// Camera
+const CAMERA_FRAME_RATIO = 0.35
+let cameraEnabled = false
+let cameraLeft = 0
+let cameraTop = 0
+let cameraDrag = null
 
 // === Broadcast Response ===
 channel.onmessage = (e) => {
@@ -36,6 +50,9 @@ channel.onmessage = (e) => {
             for (const [name, checkbox] of checkboxes) {
                 checkbox.checked = activeNames.has(name)
             }
+            break
+        case "requestCameraState":
+            SendCameraState()
             break
     }
 }
@@ -67,6 +84,68 @@ document.addEventListener('mousemove', (e) => {
 document.addEventListener('mouseup', () => {
     if (activeToken) SendToken(activeToken)
     activeToken = null
+})
+
+cameraToggleHandler.addEventListener("change", () => {
+    cameraEnabled = cameraToggleHandler.checked;
+    cameraFrameHandler.hidden = !cameraEnabled;
+
+    if (cameraEnabled) {
+        UpdateCameraFrameSize();
+    } else {
+        cameraLeft = 0
+        cameraTop = 0
+    }
+
+    SendCameraTransition()
+})
+
+
+cameraFrameHandler.addEventListener("pointerdown", (e) => {
+    if (!cameraEnabled) return
+    e.preventDefault()
+    e.stopPropagation()
+
+    cameraDrag = {
+        pointerId: e.pointerId,
+        startX: e.clientX,
+        startY: e.clientY,
+        startLeft: cameraLeft,
+        startTop: cameraTop
+    }
+
+    cameraFrameHandler.setPointerCapture(e.pointerId)
+    cameraFrameHandler.classList.add("dragging")
+})
+
+cameraFrameHandler.addEventListener("pointermove", (e) => {
+    if (!cameraDrag) return
+    if (e.pointerId !== cameraDrag.pointerId) return
+
+    const deltaX = e.clientX - cameraDrag.startX
+    const deltaY = e.clientY - cameraDrag.startY
+
+    const newLeft = cameraDrag.startLeft + deltaX
+    const newTop = cameraDrag.startTop + deltaY
+
+    cameraLeft = newLeft
+    cameraTop = newTop
+
+    cameraFrameHandler.style.left = `${cameraLeft}px`
+    cameraFrameHandler.style.top = `${cameraTop}px`
+
+    SendCameraState()
+})
+
+cameraFrameHandler.addEventListener("pointerup", StopCameraDrag)
+cameraFrameHandler.addEventListener("pointercancel", StopCameraDrag)
+
+
+window.addEventListener("resize", () => {
+    if (!cameraEnabled) return
+
+    UpdateCameraFrameSize()
+    SendCameraState()
 })
 
 // === JSON ===
@@ -508,15 +587,157 @@ function InstantiateEnemy() {
     return enemiesHandler.lastElementChild
 }
 
+function GetCameraMapBounds() {
+    const boxWidth = mapHandler.clientWidth
+    const boxHeight = mapHandler.clientHeight
+    if (
+        !mapArea ||
+        !mapArea.naturalWidth ||
+        !mapArea.naturalHeight ||
+        !boxWidth ||
+        !boxHeight
+    ) {
+        return {
+            left: 0,
+            top: 0,
+            width: boxWidth,
+            height: boxHeight
+        }
+    }
+
+    const scale = Math.min(boxWidth / mapArea.naturalWidth, boxHeight / mapArea.naturalHeight)
+    const width = mapArea.naturalWidth * scale
+    const height = mapArea.naturalHeight * scale
+
+    return {
+        left: (boxWidth - width) / 2,
+        top: (boxHeight - height) / 2,
+        width,
+        height
+    }
+}
+
+function UpdateCameraFrameSize() {
+    const oldBounds = GetCameraMapBounds()
+
+    const oldFrameWidth = cameraFrameHandler.offsetWidth || parseFloat(cameraFrameHandler.style.width) || 0
+    const oldFrameHeight = cameraFrameHandler.offsetHeight || parseFloat(cameraFrameHandler.style.height) || 0
+
+    const xRatio = oldFrameWidth > 0 && oldBounds.width > 0
+        ? (cameraLeft + oldFrameWidth / 2 - oldBounds.left) / oldBounds.width
+        : 0.5
+
+    const yRatio = oldFrameHeight > 0 && oldBounds.height > 0
+        ? (cameraTop + oldFrameHeight / 2 - oldBounds.top) / oldBounds.height
+        : 0.5
+
+    const newBounds = GetCameraMapBounds()
+
+    const frameWidth = newBounds.width * CAMERA_FRAME_RATIO
+    const frameHeight = newBounds.height * CAMERA_FRAME_RATIO
+
+    cameraFrameHandler.style.width = `${frameWidth}px`
+    cameraFrameHandler.style.height = `${frameHeight}px`
+
+    cameraLeft = newBounds.left + xRatio * newBounds.width - frameWidth / 2
+    cameraTop = newBounds.top + yRatio * newBounds.height - frameHeight / 2
+
+    cameraFrameHandler.style.left = `${cameraLeft}px`
+    cameraFrameHandler.style.top = `${cameraTop}px`
+
+    SendCameraState()
+}
+
+function SendCameraState() {
+    const bounds = GetCameraMapBounds()
+
+    const frameWidth =
+        cameraFrameHandler.offsetWidth ||
+        parseFloat(cameraFrameHandler.style.width) ||
+        bounds.width * CAMERA_FRAME_RATIO;
+
+    const frameHeight =
+        cameraFrameHandler.offsetHeight ||
+        parseFloat(cameraFrameHandler.style.height) ||
+        bounds.height * CAMERA_FRAME_RATIO
+
+    const x = bounds.width > 0
+        ? (cameraLeft + frameWidth / 2 - bounds.left) / bounds.width
+        : 0.5
+
+    const y = bounds.height > 0
+        ? (cameraTop + frameHeight / 2 - bounds.top) / bounds.height
+        : 0.5
+
+    const zoom = cameraEnabled && frameWidth > 0
+        ? bounds.width / frameWidth
+        : 1
+
+    channel.postMessage({
+        action: "cameraState",
+        enabled: cameraEnabled,
+        x,
+        y,
+        zoom
+    })
+}
+
+function StopCameraDrag() {
+    cameraDrag = null
+    cameraFrameHandler.classList.remove("dragging")
+    SendCameraState()
+}
+
+function SendCameraTransition() {
+    const bounds = GetCameraMapBounds();
+
+    const frameWidth = cameraFrameHandler.offsetWidth;
+    const frameHeight = cameraFrameHandler.offsetHeight;
+
+    const x = bounds.width > 0
+        ? (cameraLeft + frameWidth / 2 - bounds.left) / bounds.width
+        : 0.5
+
+    const y = bounds.height > 0
+        ? (cameraTop + frameHeight / 2 - bounds.top) / bounds.height
+        : 0.5
+
+    const zoom = cameraEnabled && frameWidth > 0
+        ? bounds.width / frameWidth
+        : 1
+
+    channel.postMessage({
+        action: "cameraTransition",
+        enabled: cameraEnabled,
+        x,
+        y,
+        zoom
+    })
+}
+
 // === Debug ===
 document.addEventListener("keydown", function (event) {
     if (event.key === "c") {
         channel.postMessage({ action: "cutsceneOn" })
     }
-});
+})
 
 document.addEventListener("keydown", function (event) {
     if (event.key === "v") {
         channel.postMessage({ action: "cutsceneOff" })
     }
-});
+})
+
+// :P
+cameraEnabled = false;
+cameraToggleHandler.checked = false;
+cameraFrameHandler.hidden = true;
+cameraLeft = 0;
+cameraTop = 0;
+SendCameraState();
+
+if (mapArea.complete) {
+    UpdateCameraFrameSize();
+} else {
+    mapArea.addEventListener("load", UpdateCameraFrameSize, { once: true });
+}

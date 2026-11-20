@@ -190,10 +190,14 @@ body.next::before {
 }
 
 .map {
-    position: relative;
-    height: 95vh;
-    width: 60vw;
+    position: fixed;
+    inset: 0;
+
+    width: 100vw;
+    height: 100vh;
+
     overflow: hidden;
+    z-index: 1000;
 }
 
 .map img {
@@ -349,4 +353,65 @@ body.next::before {
     width: 100%;
     height: 100%;
     object-fit: cover;
+}
+
+/* ===== CAMERA WORLD ===== */
+
+.map-world {
+    position: absolute;
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    transform-origin: 0 0;
+
+    will-change: transform;
+}
+
+.map-world .map-item {
+    position: absolute;
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: contain;
+
+    pointer-events: none;
+    user-select: none;
+}
+
+#mapHandler {
+    position: fixed;
+    inset: 0;
+
+    width: 100vw;
+    height: 100vh;
+
+    overflow: hidden;
+    z-index: 8;
+}
+
+#mapWorldHandler {
+    position: absolute;
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    transform-origin: 0 0;
+    will-change: transform;
+}
+
+#mapWorldHandler .map-item {
+    position: absolute;
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: contain;
+    user-select: none;
+    pointer-events: none;
 }

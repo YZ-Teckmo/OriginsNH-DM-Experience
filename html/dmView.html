@@ -5,8 +5,8 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/css/mainTheme.css">
-    <link rel="stylesheet" href="/css/dmViewTheme.css">
+    <link rel="stylesheet" href="css/mainTheme.css">
+    <link rel="stylesheet" href="css/dmViewTheme.css">
     <title>Editor do Mestre | Origin New Horizons DM Experience</title>
 </head>
 
@@ -15,7 +15,7 @@
         <div class="iniciative"></div>
         <div class="map" id="mapHandler">
             <img class="map-item" src="../assets/preLoaded/maps/stage1.png" alt="" draggable="false">
-
+            <div class="camera-frame" id="cameraFrameHandler" hidden></div>
         </div>
     </div>
 
@@ -29,6 +29,10 @@
 
             </div>
 
+            <label class="camera-toggle">
+                <input type="checkbox" id="cameraToggleHandler">
+                <span>Modo Câmera</span>
+            </label>
         </div>
     </div>
 
@@ -44,6 +48,6 @@
     <button class="enemy-menu-toggle" id="secondToggleHandler" onclick="PushEnemyMenu()">❮</button>
 </body>
 
-<script src="/js/main.js"></script>
+<script src="js/main.js"></script>
 
 </html>

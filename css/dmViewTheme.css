@@ -182,6 +182,7 @@ input[type="number"] {
     height: 95vh;
     width: 60vw;
     overflow: hidden;
+    position: relative;
 }
 
 .map img {
@@ -321,4 +322,68 @@ input[type="number"] {
 
 .img-option.selected {
     border-color: #4ade80;
+}
+
+/* ===== CAMERA CONTROLLER ===== */
+
+.camera-toggle {
+    position: fixed;
+    bottom: 15px;
+    right: 15px;
+    z-index: 9000;
+
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    padding: 10px 15px;
+
+    background: rgba(20, 20, 20, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+
+    cursor: pointer;
+    user-select: none;
+}
+
+.camera-toggle input {
+    cursor: pointer;
+    accent-color: #38bdf8;
+}
+
+.camera-frame {
+    position: absolute;
+
+    border: 2px solid #38bdf8;
+    background: rgba(56, 189, 248, 0.12);
+
+    box-shadow:
+        0 0 10px rgba(56, 189, 248, 0.4),
+        inset 0 0 10px rgba(56, 189, 248, 0.15);
+
+    z-index: 20;
+
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
+
+    box-sizing: border-box;
+}
+
+.camera-frame.dragging {
+    cursor: grabbing;
+
+    border-color: #7dd3fc;
+
+    box-shadow:
+        0 0 20px rgba(56, 189, 248, 0.7),
+        inset 0 0 15px rgba(56, 189, 248, 0.2);
+}
+
+.camera-frame[hidden] {
+    display: none;
+}
+
+#mapHandler {
+    overflow: visible;
 }
