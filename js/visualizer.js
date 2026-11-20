@@ -9,6 +9,7 @@ const membersHandler = document.getElementById('membersHandler')
 const mapHandler = document.getElementById('mapHandler')
 const mapArea = mapHandler.querySelector(".map-item")
 const mapWorldHandler = document.getElementById("mapWorldHandler")
+const mapImageHandler = document.getElementById("mapImageHandler")
 
 // === Variaveis Base ===
 // Cutscene
@@ -99,6 +100,15 @@ channel.onmessage = (e) => {
             break
         case "cameraTransition":
             CameraTransition(e.data)
+            break
+        case "changeMap":
+            mapImageHandler.src = e.data.mapPath
+            break
+        case "fadeIN":
+            FadeIn()
+            break
+        case "fadeOUT":
+            FadeOut()
             break
     }
 }
@@ -571,6 +581,22 @@ function CreateVideoBackground(video) {
 
 function CreateImageBackground(image) {
     root.style.setProperty('--image-cutscene', `url("${image}")`)
+}
+
+function FadeIn() {
+    root.style.setProperty("--is-cutscene", `1`)
+
+    setTimeout(() => {
+        FadeInOut(1, 1.2)
+    }, 100)
+}
+
+function FadeOut() {
+    FadeInOut(0, 1.2)
+
+    setTimeout(() => {
+        root.style.setProperty("--is-cutscene", `0`)
+    }, 1300)
 }
 
 function StartCutscene(type, source) {

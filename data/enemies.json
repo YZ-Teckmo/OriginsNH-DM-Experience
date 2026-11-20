@@ -3,19 +3,55 @@
         {
             "name": "Eradicator X1",
             "health": {
-                "current": 100,
-                "max": 100
+                "current": 750,
+                "max": 750
+            },
+            "shield": {
+                "current": 300,
+                "max": 300
+            },
+            "sanity": 180,
+            "rd": 75,
+            "token": "../assets/preLoaded/tokens/eradicator.png",
+            "tokenInfo": {
+                "width": 100,
+                "height": 100
+            }
+        },
+        {
+            "name": "Errad X1s",
+            "health": {
+                "current": 200,
+                "max": 200
             },
             "shield": {
                 "current": 100,
                 "max": 100
             },
-            "sanity": 100,
-            "rd": 35,
-            "token": "../assets/preLoaded/tokens/eradicator.png",
+            "sanity": 0,
+            "rd": 45,
+            "token": "../assets/preLoaded/tokens/erradX1s.png",
             "tokenInfo": {
                 "width": 100,
                 "height": 100
+            }
+        },
+        {
+            "name": "Errad C",
+            "health": {
+                "current": 10,
+                "max": 10
+            },
+            "shield": {
+                "current": 0,
+                "max": 0
+            },
+            "sanity": 0,
+            "rd": 0,
+            "token": "../assets/preLoaded/tokens/erradc.png",
+            "tokenInfo": {
+                "width": 70,
+                "height": 70
             }
         }
     ]

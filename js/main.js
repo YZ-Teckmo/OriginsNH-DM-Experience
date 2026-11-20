@@ -13,6 +13,7 @@ const mapArea = mapHandler.querySelector(".map-item")
 const selectsContainer = document.getElementById("selectsContainer")
 const cameraToggleHandler = document.getElementById("cameraToggleHandler")
 const cameraFrameHandler = document.getElementById("cameraFrameHandler")
+const mapImageHandler = document.getElementById("mapImageHandler")
 
 // === Variaveis Base ===
 //Tokens
@@ -398,11 +399,10 @@ function OnSelected(category, item) {
 
     switch (category) {
         case "maps":
+            mapImageHandler.src = item.path
             channel.postMessage({
-
-                //TODO: mudar o mapa por aqui :P
-
-
+                action: "changeMap",
+                mapPath: item.path
             })
             break
         case "backgrounds":
@@ -545,6 +545,9 @@ function InstantiateEnemiesInEditor() {
 
         let curS = member.querySelector(".curS")
         curS.value = enemy.sanity
+
+        let rd = member.querySelector(".lastDice")
+        rd.value = enemy.rd
 
         let name = member.querySelector(".editor-name")
         name.innerHTML = enemy.name
@@ -734,6 +737,14 @@ function SendCameraTransition() {
 
 function DeactivateCutscene() {
     channel.postMessage({ action: "cutsceneOff" })
+}
+
+function FadeIn() {
+    channel.postMessage({ action: "fadeIN" })
+}
+
+function FadeOut() {
+    channel.postMessage({ action: "fadeOUT" })
 }
 
 // :P

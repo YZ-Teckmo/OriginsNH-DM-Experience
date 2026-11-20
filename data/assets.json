@@ -2,15 +2,61 @@
     "maps": [
         {
             "id": "1",
-            "name": "Rufored 1",
-            "path": "../assets/preLoaded/maps/stage1.png"
+            "name": "nothing",
+            "path": "../assets/preLoaded/maps/nothing.png"
+        },
+        {
+            "id": "2",
+            "name": "city 1",
+            "path": "../assets/preLoaded/maps/city1.jpg"
+        },
+        {
+            "id": "3",
+            "name": "factory 1",
+            "path": "../assets/preLoaded/maps/factory1.jpg"
         }
     ],
     "cutscenes": [
         {
             "id": "1",
-            "name": "Vulpeflow 1",
-            "path": "../assets/preLoaded/cutscenes/background.jpg",
+            "name": "dream1",
+            "path": "../assets/preLoaded/cutscenes/dream1.jpg",
+            "type": "image"
+        },
+        {
+            "id": "2",
+            "name": "crystalineRoom1",
+            "path": "../assets/preLoaded/cutscenes/crystalineRoom1.jpg",
+            "type": "image"
+        },
+        {
+            "id": "3",
+            "name": "factory1",
+            "path": "../assets/preLoaded/cutscenes/factory1.jpg",
+            "type": "image"
+        },
+        {
+            "id": "4",
+            "name": "factory2",
+            "path": "../assets/preLoaded/cutscenes/factory2.jpg",
+            "type": "image"
+        },
+        {
+            "id": "5",
+            "name": "puzzle1",
+            "path": "../assets/preLoaded/cutscenes/puzzle1.jpg",
+            "type": "image"
+        },
+        {
+            "id": "6",
+            "name": "puzzle2",
+            "path": "../assets/preLoaded/cutscenes/puzzle2.jpg",
+            "type": "image"
+        },
+        {
+            "id": "7",
+            "name": "puzzle3",
+            "path": "../assets/preLoaded/cutscenes/puzzle3.png",
             "type": "image"
         }
     ],
@@ -18,7 +64,7 @@
         {
             "id": "1",
             "name": "Rufored 1",
-            "path": "../assets/preLoaded/maps/stage1.png"
+            "path": "../assets/preLoaded/background/ruforedBack.jpg"
         }
     ]
 }

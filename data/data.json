@@ -48,7 +48,13 @@
                 "max": 400
             },
             "sanity": 100,
-            "portrait": "",
+            "portrait": "../assets/preLoaded/portraits/copper.png",
+            "token": "../assets/preLoaded/tokens/pana.png",
+            "tokenInfo": {
+                "id": 3,
+                "width": 50,
+                "height": 50
+            },
             "portraitSize": {
                 "width": 90,
                 "height": 90
@@ -239,10 +245,15 @@
                 "current": "300",
                 "max": "300"
             },
-            "sanity": "125%",
-            "portrait": "",
-            "portraitSize": {
+            "sanity": "125",
+            "portrait": "../assets/preLoaded/portraits/Ashley.png",
+            "token": "../assets/preLoaded/tokens/ashley.png",
+            "tokenInfo": {
                 "id": 8,
+                "width": 50,
+                "height": 50
+            },
+            "portraitSize": {
                 "width": 90,
                 "height": 90
             },
@@ -268,7 +279,13 @@
                 "max": "??"
             },
             "sanity": "??",
-            "portrait": "",
+            "portrait": "../assets/preLoaded/portraits/cass.png",
+            "token": "../assets/preLoaded/tokens/cass.png",
+            "tokenInfo": {
+                "id": 8,
+                "width": 50,
+                "height": 50
+            },
             "portraitSize": {
                 "width": 90,
                 "height": 90

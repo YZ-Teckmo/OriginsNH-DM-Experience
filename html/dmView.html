@@ -15,7 +15,8 @@
     <div class="main">
         <div id="barStackList"></div>
         <div class="map" id="mapHandler">
-            <img class="map-item" src="../assets/preLoaded/maps/stage1.png" alt="" draggable="false">
+            <img id="mapImageHandler" class="map-item" src="../assets/preLoaded/maps/nothing.png" alt=""
+                draggable="false">
             <div class="camera-frame" id="cameraFrameHandler" hidden></div>
         </div>
     </div>
@@ -39,6 +40,8 @@
             </div>
 
             <button class="bs-btn" style=" width: 120px;" onclick="DeactivateCutscene()">desligar cutscene</button>
+            <button class="bs-btn" style=" width: 120px;" onclick="FadeIn()">fade in</button>
+            <button class="bs-btn" style=" width: 120px;" onclick="FadeOut()">fade out</button>
         </div>
     </div>
 
