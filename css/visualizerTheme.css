@@ -12,6 +12,16 @@
     --is-combat: 0;
     --active-map: url('');
     --transformed-color: rgba(255, 255, 255, 0.2);
+
+    /* layout das 3 colunas */
+    --page-padding-y: 3vh;
+    /* espaço entre o conteúdo e o topo/rodapé da tela */
+    --page-padding-x: 2vw;
+    /* espaço entre o conteúdo e as laterais (e entre as colunas) */
+    --initiative-width: clamp(240px, 20vw, 340px);
+    /* largura da coluna da iniciativa */
+    --members-width: 20vw;
+    /* largura da coluna das caixas de personagem */
 }
 
 @keyframes token-fade-in {
@@ -129,46 +139,64 @@ body.next::before {
 }
 
 
-/* ====== MAPS & OVERLAY ======*/
+/* ====== LAYOUT: 3 COLUNAS ======*/
 
+/* a tela toda, com um respiro (padding) em volta do conteúdo */
 .selected-mode {
+    box-sizing: border-box;
     width: 100vw;
     height: 100vh;
+    padding: var(--page-padding-y) var(--page-padding-x);
+
     display: flex;
-    justify-content: center;
-    align-items: center;
+    align-items: stretch;
+    gap: var(--page-padding-x);
+
     z-index: 0;
 }
 
-.menu {
-    height: 100vh;
-    width: 100vw;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+/* Coluna 1 (esquerda): iniciativa.
+   Fica escondida por padrão. O barStackVisualizer.js põe a classe "bs-on" quando
+   "Ativar barras" está marcado no controlador; sem ela a coluna não existe e as
+   outras duas ocupam o espaço dela. */
+.iniciative {
+    display: none;
+    width: var(--initiative-width);
+    height: 100%;
 }
 
-.iniciative {
-    height: 95vh;
-    width: 30vw;
+#barStackVisualizer.bs-on {
     display: flex;
     flex-direction: column;
-    opacity: 0;
-    display: none;
+    justify-content: center;
 }
 
-.iniciative.active {}
+#barStackVisualizer .bs-stack {
+    width: 100%;
+}
 
+/* Coluna 2 (meio): pega todo o espaço que sobrar; o mapa fica dentro dela */
+.map-column {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+}
+
+/* Coluna 3 (direita): caixas dos personagens */
 .members-container {
     display: grid;
     grid-template-rows: repeat(5, auto);
     grid-auto-flow: column;
     grid-auto-columns: 150px;
     gap: 0;
-    height: 95vh;
-    width: 20vw;
+
+    flex: none;
+    width: var(--members-width);
+    height: 100%;
 }
 
+/* durante a cutscene as caixas saem da coluna e ficam em linha no rodapé */
 .members-container.cutscene {
     display: flex;
     flex-direction: row;
@@ -189,15 +217,17 @@ body.next::before {
     pointer-events: auto;
 }
 
-.map {
-    position: fixed;
-    inset: 0;
 
-    width: 100vw;
-    height: 100vh;
+/* ====== MAPA ======*/
 
+/* posição relativa DENTRO da coluna do meio, então acompanha o tamanho dela */
+.map,
+#mapHandler {
+    position: relative;
+    width: 100%;
+    height: 100%;
     overflow: hidden;
-    z-index: 1000;
+    z-index: 0;
 }
 
 .map img {
@@ -205,6 +235,34 @@ body.next::before {
     height: 100%;
     object-fit: contain;
     user-select: none;
+}
+
+
+/* ====== CAMERA WORLD ======*/
+
+.map-world,
+#mapWorldHandler {
+    position: absolute;
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    transform-origin: 0 0;
+    will-change: transform;
+}
+
+.map-world .map-item,
+#mapWorldHandler .map-item {
+    position: absolute;
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: contain;
+    user-select: none;
+    pointer-events: none;
 }
 
 
@@ -330,7 +388,7 @@ body.next::before {
 }
 
 
-/* ====== PLAYER ======*/
+/* ====== TOKENS ======*/
 
 .token {
     width: 50px;
@@ -355,63 +413,32 @@ body.next::before {
     object-fit: cover;
 }
 
-/* ===== CAMERA WORLD ===== */
 
-.map-world {
-    position: absolute;
-    inset: 0;
+/* ====== MODO CÂMERA (lupa) ====== */
 
-    width: 100%;
-    height: 100%;
-
-    transform-origin: 0 0;
-
-    will-change: transform;
-}
-
-.map-world .map-item {
-    position: absolute;
-    inset: 0;
-
-    width: 100%;
-    height: 100%;
-
-    object-fit: contain;
-
-    pointer-events: none;
-    user-select: none;
-}
-
-#mapHandler {
+body.camera-mode .map-column {
     position: fixed;
     inset: 0;
-
-    width: 100vw;
-    height: 100vh;
-
-    overflow: hidden;
-    z-index: 8;
 }
 
-#mapWorldHandler {
-    position: absolute;
-    inset: 0;
-
-    width: 100%;
-    height: 100%;
-
-    transform-origin: 0 0;
-    will-change: transform;
-}
-
-#mapWorldHandler .map-item {
-    position: absolute;
-    inset: 0;
-
-    width: 100%;
-    height: 100%;
-
-    object-fit: contain;
-    user-select: none;
+body.camera-mode .iniciative,
+body.camera-mode .members-container:not(.cutscene) {
+    position: fixed;
+    top: var(--page-padding-y);
+    height: calc(100vh - 2 * var(--page-padding-y));
+    opacity: 0;
     pointer-events: none;
+}
+
+body.camera-mode .iniciative {
+    left: var(--page-padding-x);
+}
+
+body.camera-mode .members-container:not(.cutscene) {
+    right: var(--page-padding-x);
+}
+
+.iniciative-title {
+    text-align: left;
+    font-size: 26px;
 }

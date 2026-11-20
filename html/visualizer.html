@@ -5,8 +5,9 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/mainTheme.css">
-    <link rel="stylesheet" href="css/visualizerTheme.css">
+    <link rel="stylesheet" href="../css/mainTheme.css">
+    <link rel="stylesheet" href="../css/visualizerTheme.css">
+    <link rel="stylesheet" href="../css/barStack.css">
     <title>Visualizador | Origin New Horizons DM Experience</title>
 </head>
 
@@ -21,24 +22,27 @@
     </div>
 
     <div class="selected-mode">
-        <div class="menu">
-            <div class="iniciative">
 
-            </div>
+        <div class="iniciative" id="barStackVisualizer">
+            <h1 class="iniciative-title">Ordem de Turnos</h1>
+        </div>
 
+        <div class="map-column">
             <div class="map" id="mapHandler">
                 <div class="map-world" id="mapWorldHandler">
                     <img class="map-item" src="../assets/preLoaded/maps/stage1.png" alt="" draggable="false">
                 </div>
             </div>
-
-            <div class="members-container" id="membersHandler">
-
-            </div>
         </div>
+
+        <div class="members-container" id="membersHandler">
+
+        </div>
+
     </div>
 </body>
 
-<script src="js/visualizer.js"></script>
+<script src="../js/visualizer.js"></script>
+<script src="../js/bars/barStackVisualizer.js"></script>
 
 </html>

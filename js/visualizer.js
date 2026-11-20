@@ -628,6 +628,7 @@ function CameraTransition(data) {
     FadeInOut(1, 1)
 
     setTimeout(() => {
+        SetCameraMode(data.enabled)
         ReceiveCameraState(data)
     }, 1200)
 
@@ -641,6 +642,11 @@ function CameraTransition(data) {
     }, 1900)
 }
 
+function SetCameraMode(enabled) {
+    document.body.classList.toggle("camera-mode", Boolean(enabled))
+    ApplyCameraTransform()
+}
+
 // :P
 if (mapArea.complete) {
     ApplyCameraTransform();
@@ -651,3 +657,5 @@ if (mapArea.complete) {
 window.addEventListener("resize", () => {
     ApplyCameraTransform();
 });
+
+new ResizeObserver(() => ApplyCameraTransform()).observe(mapHandler)

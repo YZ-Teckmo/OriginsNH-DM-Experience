@@ -399,10 +399,19 @@ function OnSelected(category, item) {
     switch (category) {
         case "maps":
             channel.postMessage({
+
+                //TODO: mudar o mapa por aqui :P
+
+
             })
             break
         case "backgrounds":
-            document.getElementById("result").textContent = `Fundo: ${item.name}`
+            channel.postMessage({
+
+                //TODO: mudar o fundo por aqui :P
+
+
+            })
             break
         case "cutscenes":
             channel.postMessage({
@@ -411,8 +420,16 @@ function OnSelected(category, item) {
                 type: item.type
             })
             break
+        case "props":
+            channel.postMessage({
+
+                //TODO: por os props
+
+
+            })
+            break
         default:
-            document.getElementById("result").textContent = `${category}: ${item.name}`
+            console.log("Amogus")
     }
 }
 
@@ -715,18 +732,9 @@ function SendCameraTransition() {
     })
 }
 
-// === Debug ===
-document.addEventListener("keydown", function (event) {
-    if (event.key === "c") {
-        channel.postMessage({ action: "cutsceneOn" })
-    }
-})
-
-document.addEventListener("keydown", function (event) {
-    if (event.key === "v") {
-        channel.postMessage({ action: "cutsceneOff" })
-    }
-})
+function DeactivateCutscene() {
+    channel.postMessage({ action: "cutsceneOff" })
+}
 
 // :P
 cameraEnabled = false;

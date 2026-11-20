@@ -1,0 +1,342 @@
+:root {
+    --bs-fill: transparent;
+    /* fundo da barra (transparente; o blur faz o resto) */
+    --bs-blur: 5px;
+    --bs-border: rgba(255, 255, 255, 0.2);
+    /* borda fina em volta da barra */
+    --bs-ink: #141a2b;
+    --bs-ink-light: #26304c;
+    --bs-accent: #8fb4ff;
+    /* faixa lateral, iniciativa, linha da rodada */
+    --bs-first: #ffd36e;
+    /* destaque da barra de cima */
+    --bs-text: #eef2ff;
+    --bs-cut: 16px;
+    /* tamanho do triângulo na ponta direita */
+    --bs-height: 46px;
+    --bs-first-offset: 22px;
+    /* quanto a primeira barra avança para a direita */
+}
+
+/* ===== Container (fica ao lado do mapa) =====
+   Escondido por padrão. Ao ativar as barras, ele ganha "display" e empurra o mapa para o lado.
+   IMPORTANTE: o container (e os pais dele) não pode ter opacity < 1, filter, transform ou
+   overflow recortando, senão o blur não enxerga o que está atrás da barra. */
+.bs-container {
+    display: none;
+    position: relative;
+    z-index: 9;
+    flex: none;
+    box-sizing: border-box;
+    padding: 0 16px;
+}
+
+.bs-container.bs-on {
+    display: block;
+}
+
+/* ===== Pilha ===== */
+.bs-stack {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 280px;
+}
+
+/* ===== Barra ===== */
+.bs-bar {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    height: var(--bs-height);
+    padding: 0 calc(var(--bs-cut) + 12px) 0 8px;
+    color: var(--bs-text);
+    font-family: inherit;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+    transition: opacity 0.35s ease, transform 0.35s ease;
+}
+
+/* corpo da barra: fundo transparente com blur, ponta de cima maior formando o triângulo à direita */
+.bs-bar::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background: var(--bs-fill);
+    -webkit-backdrop-filter: blur(var(--bs-blur));
+    backdrop-filter: blur(var(--bs-blur));
+    border-left: 4px solid var(--bs-accent);
+    clip-path: polygon(0 0, 100% 0, calc(100% - var(--bs-cut)) 100%, 0 100%);
+}
+
+/* borda fina: um "anel" com o mesmo formato (polígono de fora menos polígono de dentro, 1px menor) */
+.bs-bar::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background: var(--bs-border);
+    clip-path: polygon(evenodd,
+            0 0, 100% 0, calc(100% - var(--bs-cut)) 100%, 0 100%, 0 0,
+            1px 1px,
+            1px calc(100% - 1px),
+            calc(100% - var(--bs-cut) - 0.7px) calc(100% - 1px),
+            calc(100% - 1.4px) 1px,
+            1px 1px,
+            0 0);
+}
+
+.bs-bar>* {
+    position: relative;
+    z-index: 1;
+}
+
+/* a primeira barra avança para a direita (margin, não transform, para a animação de troca de lugar funcionar) */
+.bs-bar.bs-first {
+    margin-left: var(--bs-first-offset);
+}
+
+.bs-bar.bs-first::before {
+    border-left-color: var(--bs-first);
+}
+
+.bs-bar.bs-first .bs-initiative {
+    color: var(--bs-first);
+}
+
+/* entrada: a barra nasce acima e desce para o lugar */
+.bs-bar.bs-enter {
+    opacity: 0;
+    transform: translateY(-24px);
+}
+
+/* saída: sai do fluxo (os outros ocupam o lugar) e some */
+.bs-bar.bs-leave {
+    position: absolute;
+    margin: 0;
+    opacity: 0;
+    transform: translateX(-24px);
+    pointer-events: none;
+}
+
+/* ===== Conteúdo da barra ===== */
+
+/* imagem solta, sem círculo nem fundo; pode passar um pouco da altura da barra */
+.bs-portrait {
+    flex: none;
+    width: 40px;
+    height: 40px;
+    margin: -5px 0;
+    object-fit: contain;
+    object-position: center bottom;
+    background: none;
+    border-radius: 0;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+}
+
+.bs-portrait.empty {
+    visibility: hidden;
+}
+
+.bs-name {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    color: inherit;
+}
+
+.bs-initiative {
+    display: inline-block;
+    flex: none;
+    width: 44px;
+    text-align: right;
+    font: inherit;
+    font-size: 16px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--bs-accent);
+}
+
+/* ===== Inputs (controlador): visual de texto, sem cara de formulário ===== */
+input.bs-name,
+input.bs-initiative {
+    padding: 2px 0;
+    background: none;
+    border: none;
+    outline: none;
+    border-radius: 0;
+}
+
+input.bs-name::placeholder,
+input.bs-initiative::placeholder {
+    color: rgba(238, 242, 255, 0.35);
+    font-weight: 400;
+}
+
+input.bs-name:focus,
+input.bs-initiative:focus {
+    box-shadow: 0 1px 0 var(--bs-accent);
+}
+
+input.bs-initiative {
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+input.bs-initiative::-webkit-outer-spin-button,
+input.bs-initiative::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* ===== Hover no controlador: sobe um pouco e mostra "+" e "×" ===== */
+.bs-editor .bs-bar:hover {
+    z-index: 5;
+    transform: translateY(-4px);
+}
+
+.bs-add,
+.bs-remove {
+    position: absolute;
+    display: grid;
+    place-items: center;
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    border: 2px solid var(--bs-ink);
+    border-radius: 50%;
+    font: inherit;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1;
+    text-shadow: none;
+    cursor: pointer;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.bs-add {
+    left: 50%;
+    bottom: 0;
+    background: var(--bs-accent);
+    color: var(--bs-ink);
+    transform: translate(-50%, 55%) scale(0.6);
+}
+
+.bs-remove {
+    top: -8px;
+    right: calc(var(--bs-cut) + 4px);
+    background: #f87171;
+    color: var(--bs-ink);
+    transform: scale(0.6);
+}
+
+.bs-bar:hover .bs-add {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translate(-50%, 55%) scale(1);
+}
+
+.bs-bar:hover .bs-remove {
+    opacity: 1;
+    pointer-events: auto;
+    transform: scale(1);
+}
+
+/* ===== Menu do controlador (botões) ===== */
+.bs-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.bs-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+.bs-toggle-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-right: 6px;
+    cursor: pointer;
+}
+
+.bs-btn {
+    padding: 6px 12px;
+    background: var(--bs-ink-light);
+    color: var(--bs-text);
+    border: 1px solid rgba(143, 180, 255, 0.4);
+    border-radius: 6px;
+    font: inherit;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.bs-btn:hover {
+    background: #34416a;
+    border-color: var(--bs-accent);
+}
+
+.bs-round {
+    margin-left: auto;
+    font-variant-numeric: tabular-nums;
+    color: var(--bs-accent);
+}
+
+/* "Ativar barras" desligado: os botões somem, só o checkbox fica */
+.bs-panel.off .bs-btn,
+.bs-panel.off .bs-round,
+.bs-panel.off .bs-list {
+    display: none;
+}
+
+/* ===== Linha da rodada (display) ===== */
+.bs-marker {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-left: 4px;
+    color: var(--bs-accent);
+    font-size: 15px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+}
+
+.bs-marker[hidden] {
+    display: none;
+}
+
+.bs-marker-line {
+    flex: 1;
+    height: 2px;
+    background: linear-gradient(90deg, var(--bs-accent), transparent);
+}
+
+.bs-marker-number {
+    display: inline-block;
+}
+
+/* ===== Menos movimento ===== */
+@media (prefers-reduced-motion: reduce) {
+
+    .bs-bar,
+    .bs-add,
+    .bs-remove {
+        transition: none;
+    }
+}

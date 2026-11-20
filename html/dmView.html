@@ -5,14 +5,15 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/mainTheme.css">
-    <link rel="stylesheet" href="css/dmViewTheme.css">
+    <link rel="stylesheet" href="../css/mainTheme.css">
+    <link rel="stylesheet" href="../css/dmViewTheme.css">
+    <link rel="stylesheet" href="../css/barStack.css">
     <title>Editor do Mestre | Origin New Horizons DM Experience</title>
 </head>
 
 <body>
     <div class="main">
-        <div class="iniciative"></div>
+        <div id="barStackList"></div>
         <div class="map" id="mapHandler">
             <img class="map-item" src="../assets/preLoaded/maps/stage1.png" alt="" draggable="false">
             <div class="camera-frame" id="cameraFrameHandler" hidden></div>
@@ -33,6 +34,11 @@
                 <input type="checkbox" id="cameraToggleHandler">
                 <span>Modo Câmera</span>
             </label>
+            <div id="barStackController">
+                <button class="bs-btn bs-reset" type="button">Zerar rodadas</button>
+            </div>
+
+            <button class="bs-btn" style=" width: 120px;" onclick="DeactivateCutscene()">desligar cutscene</button>
         </div>
     </div>
 
@@ -48,6 +54,7 @@
     <button class="enemy-menu-toggle" id="secondToggleHandler" onclick="PushEnemyMenu()">❮</button>
 </body>
 
-<script src="js/main.js"></script>
+<script src="../js/main.js"></script>
+<script src="../js/bars/barStackController.js"></script>
 
 </html>
